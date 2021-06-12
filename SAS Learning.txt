@@ -1,0 +1,711 @@
+*-------------------------------------*
+|              COMMENTS               |
+*-------------------------------------*;
+* You can comment out a line by using an asterisk at the beginning of the line and a semicolon at the end;
+* With this method, any semicolon will be interpreted as the end of the comment. So this method is unable to comment and code out that has a semicolon
+This makes it unsuitable to use for inline comments.;
+
+
+/* You can also comment out a line this way, by using forward slash and asterisks*/
+/* This method is useful for inline comments as a ; will not be parsed as the end of the comment
+it can also be used for multi-line comments */
+
+/*A shortcut to commenting out one or more lines in your code*/
+/*is to highlight the text that you want to comment out*/
+/*and press Ctrl + / to comment out those lines*/
+/*to then uncomment out those lines, press Ctrl + Shift + /*/
+
+*-------------------------------------*
+|              SEMICOLONS             |
+*-------------------------------------*;
+* Every statement ends in a semicolon. This usually means that every line ends in a semicolon but sometimes
+your statement can be on multiple lines. A semicolon is only necessary at the end of the statement. Notice that
+this comment is on multiple lines, but it only has a semicolon at the end of the last line to signal the end 
+of the comment;
+
+*-------------------------------------*
+|              SHORTCUTS              |
+*-------------------------------------*;
+*	- F3 or F8, run or submit a program
+	- CTRL + /, comment the selected code
+	- CTRL + SHIFT + /, uncomment the selected code
+	- CTRL + BREAK, stop processing or cancel the submitted statement
+	- CTRL + SHIFT + U, convert selected text to uppercase
+	- CTRL + SHIFT + L, convert selected text to lowercase
+	- CTRL + F, find text
+	- CTRL + H, find and replace
+	- CTRL + I, automatically format highlighted code (Enterprise only)
+
+
+*-------------------------------------*
+|           QUOTATION MARKS           |
+*-------------------------------------*;
+* Text can be enclosed in either quotation mars ("text") or by apostrophes ('text') as long it is consistent
+	"this works"
+	'this works'
+	'this doesn't work' -> since there is a single quote in the text, SAS will instead recognize this quote as the ending of the quotations
+	"this doesn't work" -> this is the right way to do it, by using quotation marks os that the single quotation isnt interpreted as the end of the string;
+
+*-------------------------------------*
+|            DATA & PROC Step         |
+*-------------------------------------*;
+* SAS code is organized in blocks of code. The data step is where the data is created and manipulated 
+while the precedure (PROC) step is where data is analyzed and changed in format. Some other statements that occur other
+than data or proc steps are global statements that have effects that last until the SAS session is over.
+
+Data steps begin with the keyword DATA and the proc statement begins with the keyword PROC. 
+All data or proc steps end with the RUN statment, which tells SAS to run the preceding block of code;
+
+
+DATA name;
+*some code here;
+RUN;
+
+PROC PRINT DATA = name;
+*code here;
+RUN;
+
+A procedure is SAS is akin to calling a function in other programming languages. The above code called the PRINT function, but there 
+are many in SAS each with their own syntax.;
+
+*-------------------------------------*
+|              LIBRARIES              |
+*-------------------------------------*;
+* A SAS library is a folder on the computer that contains SAS data. We want to alias/load the library using the LIBNAME statement in SAS.
+The LIBNAME statement is a global statement that occurs invididually by itself outside a DATA or PROC step. The format of a LIBNAME statement is:;
+
+LIBNAME MYLIB 'C:\Users\Victor\OneDrive\Documents\TestLib";
+
+*LIBNAME is the keyword that tells the compiler to create a library with the name "MYLIB". This library name must be 8 characters or less
+and must start with a letter. It is standard practice to put the LIBNAME statements at the beginning of the SAS program but it can be put anywhere 
+as long as it comes before code where you reference data in that location. 
+Once we've assigned a library name, we can reference them using:
+
+MYLIB.dataset_name
+
+This references the library named "MYLIB" and the data table within MYLIB named "dataset_name". Notice the period that separates the two parts.
+When we close SAS, any libraries that we define are deleted from the environment, we will need to run the LIBNAME statement again to load the libraries
+
+SAS has a special built-in library named WORK. This is a temporary library (all data in it is deleted after you exit SAS) that stores all the datasets
+that are created in a SAS session. We do not have to declare the work library with the LIBNAME statement since it is automatically created when SAS is opened.
+Furthermore, we do not have to use the "WORK" reference when we reference a dataset in the work library. SAS will assume that any dataset reference without a 
+library is in the WORK library.For example, the following two lines: 
+
+WORK.statsdata
+statsdata
+
+are the same. They both reference the "statsdata" dataset in the WORK library. ;
+
+*-------------------------------------*
+|             DATA Step               |
+*-------------------------------------*;
+* Recall that the data step is where data is created, imported, modified, merged or calculated. The Data step follows the following format: ;
+
+DATA datastep_name (OPTIONS);
+*code here;
+RUN;
+
+* The keyword DATA is what tells SAS to create a new dataset with name datastep_name. Any dataset options go in the parenthesis after the name of the new dataset.
+We can manipulate the dataset in the lines after the DATA line and before the RUN line. Once again note that the data step is ended with RUN and a semicolon.;
+
+/*------SET Statement------*/
+
+*This statement is used in the DATA step when we want to copy an existing dataset. The code will look like: ;
+
+DATA New_Dataset ();
+	SET Old_Dataset ();
+RUN;
+
+* This above statement tells SAS to create a new dataset named New_Dataset and copy the data from Old_Dataset. Note that options for modifying the data
+can be added in the parentheses or underneath the SET statement in the DATA step. Note that in the code above , there is no reference to a library, which
+implies that the dataset Old_Dataset is in the WORK library already.
+
+We can also modify an existing dataset without creating a new dataset by using the same name when creating the new dataset.;
+
+DATA Old_Dataset;
+	SET Old_Dataset;
+	*Some other code;
+RUN;
+
+* This above code will overwrite the existing dataset Old_Dataset with whatever changes are made in the code.;
+
+/*------DATA Step Options------*/
+
+* Data step options appear directly in parenthesis after the name of a dataset in either the DATA statement or in the SET statement.;
+
+DATA New_Dataset ();
+	SET Old_Dataset ();
+RUN;
+
+* We can use DROP and KEEP to manipulate our dataset to only have the variables that we want.
+	- KEEP tells SAS to keep only the listed variables (all others will be removed)
+	- DROP tells SAS to remove only the listed variables (all others will be kept)
+We can use the two statements to do the same thing, but one will be much easier depending on the situation. If we only want to remove a few variables, then
+DROP will be more useful. If we only want to keep a few variables, then KEEP will be more useful. ;
+
+*Ex 1. By Name;
+* Suppose we have a dataset with the variables (columns): height(cm) and weight(kg). Suppose that we only want to keep the height column in the output.
+We can do either of the following: ;
+
+DATA Option1 (DROP = weight);
+	SET sample;
+RUN;
+
+DATA Option2 (KEEP = height);
+	SET sample;
+RUN;
+
+DATA Option3;
+	SET sample (DROP = weight);
+RUN;
+
+DATA Option4;
+	SET sample (KEEP = height);
+RUN;
+
+* Notice in the above example that DROP and KEEP (and any other Data Step Option) can be used both in the DATA statement and the SET statement, so what's the difference?
+Any changes that you make in the SET statement will take place immediately, these will be applied to the data as it is being read from the old data set. If you rename
+variables in the SET statement, you will need to refer to their new names in the computations in the DATA step. Any other changes that you make will take effect immediately
+and must be taken into account when playing with the data in the DATA step.
+Any Data Step Options in the DATA statement will take place as the data is being assigned to the new data set. These can be thought of as finishing touches when the computations
+in the DATA step are finished.
+
+
+*Ex 2. By Type;
+* Now suppose we have a dataset and we only want to keep all charater variables or all numeric variables, then we can use _CHAR_ and _NUMERIC_ respectively in 
+place of variable names. These can be used in both KEEP and DROP statements. Suppose that we want to keep only the "height variable" along with all character
+variables, then we can do:;
+
+DATA Option (KEEP = height _CHAR_)
+	SET Sample;
+RUN;
+
+* We can use the RENAME statement to change the name of one or more of our variables, the form is:
+	RENAME = (oldname1 = newname1 oldname2 = newname2 oldname3 = newname3 ...)
+;
+
+DATA Sample2 (RENAME = (gender = Sex DOB = DATE_OF_BIRTH)
+	SET Sample;
+RUN;
+
+* The above code will copy over the data in sample but rename gender to sex and DOB to DATE_OF_BIRTH;
+
+*-------------------------------------*
+|             OPERATORS               |
+*-------------------------------------*;
+* Arithmetic Operators
+	** is used to denote exponentiation
+	* is used to denote multiplication
+	/ is used to denote division
+	+ is used to denote addition
+	- is used to denote subtraction;
+
+* Comparison Operators
+	= or EQ means "equal to"
+	^= or NE or ~= means "not equal to" (Note the symbol used for this one will depend on the computer)
+	> or GT means "greater than"
+	< or LT means "less than"
+	>= or GE means "greater than or equal to"
+	<= or LE means "less than or equal to";
+
+
+* The IN Operator;
+* The IN operator is a comparison operator to see if an item is equal to one of the items in a list
+	x IN (1,2,3,4,5,6,7,8,9,10)
+	x IN (1:10)	* Note that the syntax a:b only works for integers such that a < b and is inclusive of a and b
+	x IN (0,1,5:10)	* This is also valid
+
+* Character Comparisons;
+* Character comparisons use the ASCII sequences and progress left to right so B>A is true, Adam > Abba is true as well. When comparing two strings of unequal 
+length, SAS will add blanks to the end of the shorter string and compare that way.
+
+* Logical (Boolean) Operators;
+	& or AND evaluates to true iff both are true
+	| or OR or ! evaluates to true iff one of the two are true
+	^ or NOT or ~ will evaluate to true if false and false if true
+Note:
+- We can link comparisons 16<=age<=65, is the same as 16<=age & age<=65
+- A missing value in SAS is FALSE
+- TRUE has a value of 1 and FALSE has a value of 0
+- Any number not equal to 0 or missing is true
+
+
+*-------------------------------------*
+|             VARIABLES               |
+*-------------------------------------*;
+* In SAS these correspond to columns in a data table. There are 5 properties of a SAS dataset variable name: name, type, length, format, and label;
+/*------Name------*/
+* 	- must be 32 characters or less
+	- can start with either a letter or an underscore, but cannot start with a number. Numbers can be used in the variable name after the first character
+	- cannot contain a space
+While variables can be named anything, it is good practice to have descriptive names;
+
+/*------Type------*/
+* There are two types of variables in SAS, numeric and character.
+	- Numeric: stores numbers. These variables can have arithmetic calculations performed on them. They can also be used as indicator variables to represent
+		categorical data (yes = 1, no = 0). This is especially useful for ordinal categorical variables (1 = bad, 2 = neutral, 3 = good) that have an
+		inerent order to them. Dates in SAS are also stored as numerics (number of days since 1/1/1960)
+	- Character (String): these contain text and can even contain special symbols or even numbers. 
+Missing numerics show up as periods (.) and missing character variables show up as blanks ("");
+
+/*------Length------*/
+* The length of a variable is not the way we think of length in the traditional sense, but the "length" of a variable is the number of bytes used to store that variable
+The default for both character and length variables is 8 bytes)
+
+/*------Variable Format------*/
+* This tells SAS how it should display the variable in the SAS output. This can mean:
+	- Number of decimal points to show in a numeric variable
+	- Date formats
+	- Including commas in large numbers or including dollar signs
+	- Value labels for categorical variables coded as numbers (1 = yes, 0 = no)
+Formatting is important for presenting data and understanding data;
+
+/*------Label------*/
+* The data label is a way to provide infomation about a variable other than the name. Data labels can be assigned both in the DATA statement or the PROC step. 
+If labels are used in the DATA step, then they become a permanent part of the data set. If labels are used in the PROC statement, then they are only there for the
+particular PROC step the label is added in. A label statement looks like:
+	LABEL variable_name = "Variable label";
+
+The label is what appears in table outputs and when viewing the table, but when refering to the column in your code, we still use the variable name.
+
+* Computing New Variables;
+
+* The constant variable is the same for all entries in a dataset.;
+DATA newData;
+	SET oldData;
+	newVar1 = "a";	* new constant character variable;
+	newVar2 = 1;	* new constant numeric variable;
+RUN;
+
+* Arithmetic can be used to compute a new variable
+DATA newData;
+	SET oldData;
+	height_CM = Height_IN * 2.54;
+RUN;
+
+/* We can use IF-THEN statements to compute new variables. These follow the format:
+
+	IF <condition> THEN newvar = ...;
+	ELSE IF <condition> THEN newvar = ...;
+	ELSE newvar = ...;
+
+The condition must evaluate to a boolean (either TRUE or FALSE)*/
+
+* SAS has many functions that return values, these can also be used to assign new variables:
+	newvar = function(a,b,c);
+
+
+*-------------------------------------*
+|          MISSING VALUES             |
+*-------------------------------------*;
+* Missing characters will appear as blanks
+* Missing numerics (including dates) will appear as periods
+
+SAS may treat missing values as either a really large or small number. Some functions may ignore them, but it is good practice to tell SAS how to handle missing values.
+To check for missing values, we specify IF (var = .) or IF (var = "");
+
+*-------------------------------------*
+|             FORMATTING              |
+*-------------------------------------*;
+* Some notes on formatting:
+	- SAS is not case sensitive so upper and lower case letters are the same, even for variables
+	- indendation or spacing BEFORE a statement is ignored
+	- extra spacing between statements are ignored
+	- multiple statements can appear on the same line as long as they are separated by a semicolon
+	- statements can be broken in to multiple lines as long as they end with a semicolon;
+
+/*------Informats------*/
+* An informat tells SAS how to read in a variable from an imported data source. Every variable in a SAS database has an informat for when it is read in.
+Checking the informat of imported data will help to confirm that they were imported correctly. There are 3 main classes of informats:
+	- Date: MMDDYYw. reads in date data of the form w
+	- Characters: $w. reads in character data with length w
+	- Numeric: w.d reads in numeric data of length w with d decimal places
+All the informats have a period. This is to tells SAS that this is an informat name and not a variable name. This period is mandatory.
+
+/*------Format------*/
+* A format tells SAS how to display a variable when printed to the output window or when viewed in a viewtable. This does not change the underlying data, it only changes 
+how the data looks when it is printed or displayed in SAS. The format for a variable doesn't have to be the identical to the informat for a variable. The informat is stated
+when we read in data or when we are creating a new variable, but the format statement is used in a DATA or a PROC step.
+	- Assigning a format to a variable in a data step will permanently store the variable's format assignment as part of the dataset
+	- Assigning a format to a variable in a proc step will temporarily store the variable's format assignment for the proc step it is in.
+
+Formats, like iformats, will always contain a period. Every variable has a format, whether it is assigned manuall by you or if SAS assign it automatically. The advantage to assigning 
+formats is that it lets you easily interpret the value you see in a table or in output. 
+
+The general form of a format statement is: 
+	FORMAT varName formatName.;
+* FORMAT is the keyword that tells SAS to assign a format to a variable. The varName is the variable you want to assign the format to, and the formatName is the format.
+
+/*------Changing Format in DATA Step------*/
+DATA newDAata;
+	SET oldData;
+	FORMAT birthday MMDDYY10. DOB MMDDYY10.;  * Here we reformat the birthday and DOB variables to the MM/DD/YYYY formatting.;
+RUN;
+
+*Changing Format in a PROC Step;
+PROC PRINT DATA = newData;
+	VAR birthday;
+	FORMAT birthday WORDDATE20.;
+RUN;
+
+/*------User-Defined Formats------*/
+* Sometimes SAS doesn't have formats that we want (such as in the case of ordinal categorical variables) so we would like to build our own formats. We can do this using the PROC FORMAT procedure. 
+The general form is:;
+
+PROC FORMAT;
+	VALUE format_name
+		DATA_VAL1 = "Label1"
+		DATA_VAL2 = "Label2";
+	VALUE format_name2
+		DATA_VAL3 = "Label3"
+		DATA_VAL4 = "Label4";
+RUN;
+
+* We can name the format anything we want as long as it:
+	- starts with a letter
+	- doesnt end in a number
+	- has less than 32 characters
+	- isn't the same as any variable name;
+
+* For example, suppose that you have ordinal categorical data that has been encoded as numeric data for ease of use, then we may want to assign the following formatting:;
+PROC FORMAT;
+	VALUE level_agree_format
+		1 = "Strongly Disagree"
+		2 = "Disagree"
+		3 = "Slightly Disagree"
+		4 = "Neutral"
+		5 = "Slightly Disagree"
+		6 = "Agree"
+		7 = "Strongly Agree";
+RUN;
+
+* We can also assign many values to have the same label;
+PROC FORMAT;
+	VALUE level_agree_format2
+		1,2,3 = "Disagree"
+		4 = "Neutral"
+		5,6,7 = " Agree";
+RUN;
+
+* For ordinal codes (with a discernable order) we can assign labels to a range;
+PROC FORMAT;
+	VALUE level_agree_format3
+		1-3 = "Disagree"
+		4 = "Neutral
+		5-7 = "Agree";
+RUN;
+
+* We can also use the keywords LOW and HIGH to give labels to continuous data ranges;
+PROC FORMAT;
+	VALUE income_format;
+		LOW - <100000 = "Low"		* All data less than 100000 is labelled "Low"
+		100000-<500000 = "Middle"	* All data 100000 or greater and less than 500000 is labelled "Middle"
+		500000 - HIGH = "High";		* All data greater than 500000 is labelled "High"
+RUN;
+
+* We can use the keyword OTHER to specify all other data values;
+PROC FORMAT;
+	VALUE race
+		1 = "White"
+		2 = "Black"
+		OTHER = "Other";
+RUN;
+
+* We can also create formats for character variables, but there are some differences to keep in mind:
+	- The name of the format must start with $
+	- The character values (left of equal sign) must be in quotes;
+
+PROC FORMAT;
+	VALUE $gender			/* Notice the $ at the beginning of the label name to indicate a character format*/
+		"M" = "Male"
+		"F" = "Female";		/* Note here that there is a semicolon at the last label of this set*/
+	VALUE age			/* Note that we can create multiple formats in the same PROC FORMAT statement*/
+		0-20 = "Young"
+		20-50 = "Middle"
+		50-100 = "Old";
+RUN;
+
+* Remember that after the format is created, it must still be applied to the data.
+
+DATA newDATA;
+	SET oldDATA;
+	FORMAT gender $gender. years age.;	*Notice that the . after each format name tells SAS that its a format and not a variable.;
+RUN;
+
+*-------------------------------------*
+|              DATE-TIME              |
+*-------------------------------------*;
+* Dates in SAS, regardless of informat or format, are stored as numerics representing the number of days since 1/1/1960 (so day 0 is 1/1/1960). Days before 1/1/1960 are stored
+as negative numbers and days after are stored as positive ones. This format makes date arithmetic easier, but isn's so easy to interpret by humans. This is the default way SAS
+formats date values so we must apply a format to view these dates normally. 
+
+* MMDDYYw Formatting
+ 	- MMDDYY10. will display as 09/23/2012
+	- MMDDYY8.  will display as 09/23/12
+	- MMDDYY6.  will display as 092312
+	- MMDDYY5.  will display as 09/23
+	- MMDDYY4.  will display as 0923
+	- MMDDYY2.  will display as 09
+;
+* DDMMYYw Formatting
+	- DDMMYY10. will display as 23/09/2012
+	- DDMMYY8.  will display as 23/09/12
+	- DDMMYY6.  will display as 230912
+	- DDMMYY5.  will display as 23/09
+;
+
+* For the two formats above, we can also add a letter before the final number to indicate the type of special character we want separating the day, month, and year
+	- B separates with blank
+	- C separates with a colon
+	- D separates with a dash
+	- N indicates no separator
+	- P separates with a period
+	- S separates with a slash
+So DDMMYYC10. will display as 23:09:2012
+;
+
+* DATEw Formatting
+	- DATE11. will display as 23-SEP-2012
+	- DATE9.  will display as 23SEP2012
+	- DATE7.  will display as 23SEP12
+	- DATE5.  will display as 23SEP
+;
+
+* The same above syntax can be used for informatting, informatting doesn't care about the types of delimiters used nor the number, as long as the number is large enough to allow for delimiters
+
+Example:;
+
+DATA WineRanking;
+	INPUT Brewery $ Name $ rank 3. date MMDDYY10.;
+	FORMAT date MMDDYY8.;
+	DATALINES;
+		Lafite Pinot 56 09/14/2012
+		Lafite Merlot 91 09/15/2012
+		Sterling Pinot 65 06/30/2012
+	;
+RUN;
+
+* This above example will read in character data for company and type, numeric data of length 3 for score and date data of format MMDDYY8.. Note, after reading in the date data, SAS will store
+the date as a numeric in the number of days since 1/1/1960. We then assign a MMDDYY8. format to the date variable to display it as "MM/DD/YY". Notice that company and type are both character
+variables (as seen by the $) but they have no specified length.;
+
+* Time values in SAS are a numeric value that represents the number of seconds since midnight of the current day;
+* Datetime values in SAS represent the number of seconds between Jan 1, 1960 00:00am and some other time;
+
+* We may want to use a two-digit number to represent the year. In this case, we need to use the system option:;
+OPTIONS YEARCUTOFF = 1923;
+* This function will allow us to specify the first year to read in as two-digit year. So setting YEARCUTOFF = 1923 means that 23-00 will now represent the years 1923-2000 and 1-22 will represent 2001-2022;
+
+* By default SAS stores and displays date-time variables as integers, so to make them easily readable, we must apply a format to them. To get useful information from date-time variables we must
+use certain functions:;
+
+* Date Extraction Functions;
+* Used to extract a portion of a date from a date variable
+	- YEAR returns the year
+	- QUARTER returns the quarter 1-4
+	- MONTH returns the month 1-12
+	- DAY returns the day of the month as a number 1-31
+	- WEEKDAY returns the day of the week as a number 1-7 (1 = Sunday, 2 = Monday, 3 = Tuesday, ...)
+
+* Date Creation Functions;
+* create new datetime variables based on input
+	- MDY vreates a date variable given numbes for month, day, and year
+
+* Date Computation Functions;
+* Carry out arithmetic functions on dates
+	- DATDIF difference in days between two dates or datetimes
+	- YRDIF difference in years between two dates or datetimes
+In the above two functions, they require an additional "basis" arguement to determine how the arithmetic is carried out. It determines the number of days that should be in a month or year.
+The function accepts the following 5 character strings as valid inputs:
+	- '30/360' 30 days in a month and 360 days in a year, regardless of actual number of days in a calendar month
+	- 'ACT/ACT' or 'ACTUAL' uses actual number of days between dates
+	- 'ACT/360' uses actual number of days in a particular month and 360 days in a year
+	- 'ACT/365'
+	- 'AGE' (for YRDIF only) specifies the person's age will be computed. Is the default option for YRDIF
+;
+
+* The proper syntax for these functions are:;
+
+DATE sample;
+	SET sample;
+	yr = YEAR(DOB);
+	quarter = QTR(DOB);
+	mn = MONTH(DOB);
+	days = DAY(DOB);
+	wkday = WEEKDAY(DOB);
+	newday = MDY(12,31,99);			/* Month 1-12, Day 1-31, and 2 or 4 digit year. Remember that this defaults to displaying as a integer so should set a format*/
+	dif = DATDIF(startDay, endDay, basis);	/* "basis" is a string parameter chosen from one of the 5 listed above that specifies how to count the days*/
+	yrs = YRDIF(startday, endDay, basis);
+RUN;
+	
+*-------------------------------------*
+|            SORTING DATA             |
+*-------------------------------------*;
+* We use the PROC SORT prodecure to order data according to one or more of the variables. We can sort both numeric and character variables. The general form is:;
+
+PROC SORT <options>;
+	BY variables;
+RUN;
+
+* Some common options to include after the PROC SORT statement are:
+	- DATA = datasetName, specifies the dataset to be sorted. If not specified, will choose the most recently processed dataset.
+	- NODUPLICATES, will eliminate duplicate records in the dataset as long as the duplicates are next to each other in the dataset (duplicates have matching data for all columns)
+	- NODUPKEY, will eliminate observations that have duplicate values for all variables specified in the BY statement. (duplicates have matching data for columns specified in BY statment)
+	- OUT = newDatasetName, will specify where to output the sorted data. If not specified, will overwrite the unsorted dataset.;
+
+* The BY Statement;
+* This line tells SAS what variables to sort the data on:
+	- If only one variable is listed, then will sort the dataset ascending on that variable.(missing values are considered the smallest so they will appear first)
+	- We can sort in descending order by putting the keyword DESCENDING before the variable name that we want sorted in descending order
+	- When more than one variable is listed, will sort by the first dariable, then second variable within each category of the first and the third within each category of the first and second ...
+	- SAS will sort the data by the order the variables are listed in the BY statment
+
+*-------------------------------------*
+|    SUBSETTING & SPLITTING DATA      |
+*-------------------------------------*;
+* Rather than only selecting or subsetting columns (see DATA STEP section above), here we want to filter out rows of data.
+* A subset is akin to filtering out data from a given dataset. When subsetting, we will be left with only a single dataset as a result of subsetting;
+* A split is a division of the dataset into multiple pieces. This will create two or more datasets as a result of splitting;
+
+* Both splitting and subsetting are performed inside of a DATA step and use of conditional logic. These will create new datasets based on the given conditions;
+
+/*---Subsets---*/
+* We can subset data by using inclusion and exclusion criteria. These are conditional logic (IF statements) that keep/exclude rows based on one or more variables.;
+
+DATA newDataset;			/* This code will keep the rows that satisfy the condition*/
+	SET oldDataset;
+	IF (condition) THEN OUTPUT;	/* conditions can use extra parentheses or logical operators to create complex conditions*/
+RUN;
+
+DATA newDataset;			/* This code will delete the rows that meet the condition*/
+	SET oldDataset;
+	IF (condition) THEN DELETE;
+RUN;
+
+* We can also generate a subset by specifying rows to keep directly.;
+
+DATA newDataset;
+	SET oldDataset (firstobs = i);	/* This will keep all rows starting at the ith row*/
+RUN;
+
+DATA newDataset;
+	SET oldDataset (obs = j);	/* This will keep the first j rows*/
+RUN;
+
+DATA newDataset;
+	SET oldDataset (firstobs = i obs = j);	/* This will keep rows i - j (inclusive of i and j)*/
+RUN;
+
+* A more efficient way to subset data is to use the WHERE option in the DATA or SET step. Using WHERE is more efficient than using IF because SAS will not even read lines that don't satisfy the given condition;
+DATA newDataset;
+	SET oldDataset (WHERE = (condition));
+RUN;
+
+/*---Splitting---*/
+* This is a method to split a dataset into two or more datasets. This method uses the IF-THEN OUTPUT logical statements;
+
+DATA newDataset1 (options) newDataset2 (options);
+	SET oldDataset;
+	IF (conditions) THEN OUTPUT newDataset1;	/* If instead we use IF-ELSE, then we will create two mutually exclusive and exhaustive new datasets*/
+	IF (conditions) THEN OUTPUT newDataset2;
+RUN;
+
+*-------------------------------------*
+|           MERGING DATSETS           |
+*-------------------------------------*;
+* When we want to combine datasets, we can either
+	- Append: stacking the second dataset below the first dataset
+	- Joining: joining the datasets in a way such that variables from one dataset can be matched to the rows of the other
+Appending is useful to combine two datasets with similar or identical structures. Merging is useful for combining two datasets that have relevant data, abnd have 
+a key to join them.
+
+* We can append two datasets within a DATA step using the SET statement;
+
+DATA newDataset;
+	SET oldDataset1 (options) oldDataset2 (options);
+RUN;
+
+* Some notes on combining datasets with the above method:
+	- if the two datasets have different variable names, then the new dataset will include all the unique variable names, and assign missing values where appropriate
+	- if the two datasets have the same variable names, but they have different formats, labels, or lengths, the new dataset will use the variable definitions from the first dataset
+	- if the dataset have the same variable but the variable types are different, (character or numeric) then SAS will stop the DATA step
+;
+
+* We can join two datasets using the PROC SQL command and SQL code;
+
+PROC SQL;
+CREATE TABLE newTableName AS
+SELECT a.*, b.*
+FROM table1 AS a JOIN table2 as b ON a.key = b.key;
+QUIT;
+
+*-------------------------------------*
+|     IMPORTING DATA FROM EXCEL       |
+*-------------------------------------*;
+
+* Using SAS 9.3 32-bit;
+* With this verison of SAS, we will be using the IMPORT function in SAS. The general form is:;
+
+PROC IMPORT OUT = WORK.test	/* The OUT option tells SAS where to place the imported dataset. In this case it will create a dataset called test in the work library*/
+		DATAFILE="C:/mydata/Sample Data.xlsx"	/* the file directory (location) of the file we are importing*/
+		DBMS = EXCEL	/* DBMS option tells the program which engine to use for the importing. EXCEL for 32-bit systems and XLSX for 64-bit systems*/
+		REPLACE;	/* Optional statement that tells the program to override any existing datasets if it has the same name as what we specified in OUT*/
+/* The following statements are optional*/
+	RANGE = "Sheet1$";	/* This tells SAS which sheet to read, in this case a sheet named Sheet1. The $ tells SAS to read the entire sheet. Will read entire sheet by default*/
+	GETNAMES = YES;		/* tells SAS to use the first row as variable names*/
+	MIXED = YES;		/* if SAS detects multiple formats in a column, it will read in the data instead as a string variable*/
+	SCANTEXT = YES;		/* will apply to columns with text. Looks for longest string and uses its length as the variable length*/
+	USEDATE = YES;		/* tells SAS to read in dates using a date format. If NO, then SAS will read dates as a string instead*/
+	SCANTIME = YES;		/* tells SAS to scan the variables using time-based formats*/
+
+
+* Using SAS 9.4 or 9.3 64-bit;
+* With this version of SAS it is still possible to read in data using the IMPORT command and modifying DBMS = XLSX, but it will potentially make some mistakes:
+	- some time-specific formats like hh:mm:ss will be read in as dates
+	- Some strings will be reduced in length since their width exceeds the default length for strings
+	- if the sheet name contains a space
+The most reliable way to read excel files in a 64-bit version of SAS is to use LIBNAME PCFILES:;
+
+* Step 1: read the excel file;
+LIBNAME myexcel PCFILES PATH = "C/Data/sample data.xlsx"	/* Reads the excel workbook in the given filepath into a SAS library called myexcel*/
+	SCANTIME = YES						/* checks SAS for time formats and reads them in as time informats*/
+	STRINGDATES = NO					/* tells SAS not to read date formats as strings but instead as dates*/
+	DBMAX_TEXT = 2000;					/* This sets the max length of string variables to 2000 (default is 1024)*/
+
+* If there is any chinese, korean or japanese characters in the data (or if some character variables are showing as corrupt) , add UNICODE = YES to the LIBNAME PCFILES statement;
+
+* Step 2: copy the data into a SAS dataset;
+DATA work.sample;
+   SET myexcel.'sheetname 1$'n;	/* note the n before the semicolon is there to indicate that the sheet name has a space. If there is no space, it can be ommitted*/
+				/* recall that the $ is there at the end of the name to tell SAS to read in the entire sheet*/
+RUN;
+
+*-------------------------------------*
+|           MACRO Variables           |
+*-------------------------------------*;
+* Macro variables are used to store a value. There are two types:
+	- Local: if the macro variable is define inside a macro code, then the scope of the variable is local. It is only available in that macro and is destroyed after
+	- Global: if defined outside a macro code, the scope of the macro variable is global. It can be used anywhere in the SAS program and gets removed when SAS is closed
+We can create macro variables in various ways:
+
+/*---%LET---*/
+* We can use this method to define a macro variable inside and outside a macro;
+
+%LET macroVariableName = value;
+
+* We can reference a macro variable using a & followed by the variable name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
